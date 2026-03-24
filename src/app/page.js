@@ -6,26 +6,28 @@ export default function Home(){
   const [name, setName] = useState("")
   const [role, setRole] = useState("")
 
-  const fetchUsers = async () => {
+  // READ data
+  const ambilDataUser = async () => {
     const res = await fetch("/api/users")
 
     if (!res.ok) {
       console.error("API Error")
       return
     }
-    
+
     const data = await res.json()
     setUsers(data)
   }
 
   useEffect(() => {
-    fetchUsers()
+    ambilDataUser()
   }, [])
 
+  // CREATE data
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    await fetch("api/users", {
+    await fetch("/api/users", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({name, role}),
@@ -33,7 +35,34 @@ export default function Home(){
 
     setName("")
     setRole("")
-    fetchUsers()
+    ambilDataUser()
+  }
+
+  // DELETE data
+  const deleteUser = async (id) => {
+    await fetch("/api/users", {
+      method: "DELETE",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({id}),
+    })
+
+    ambilDataUser()
+  }
+
+  // UPDATE data
+  const updateUser = async (id) => {
+    const name = prompt("Input New Name")
+    const role = prompt("Input New Role")
+
+    if (!name || !role) return
+
+    await fetch("api/users", {
+      method: "PUT",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({id, name, role}),
+    })
+
+    ambilDataUser()
   }
 
   return (
@@ -62,6 +91,12 @@ export default function Home(){
         <div key={user.id} style={{marginTop: "15px"}}>
           <h3>{user.name}</h3>
           <p>{user.role}</p>
+          <button onClick={() => deleteUser(user.id)}>
+            Delete
+          </button>
+          <button onClick={() => updateUser(user.id)}>
+            Update
+          </button>
         </div>
       ))}
     </div>

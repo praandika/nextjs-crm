@@ -28,3 +28,46 @@ export async function POST(request) {
 
     return Response.json(newUser)
 }
+
+export async function DELETE(request) {
+    try {
+        const {id} = await request.json()
+
+        await prisma.user.delete({
+            where: {id: Number(id)},
+        })
+
+        return Response.json({message: "User deleted"})
+    } catch (error) {
+        console.error(error)
+
+        return Response.json(
+            {error: "Server Error"},
+            {status: 500}
+        )
+    }
+}
+
+export async function PUT(request) {
+    try {
+        const body = await request.json()
+
+        const updateUser = await prisma.user.update({
+            where: {id: Number(body.id)},
+            data: {
+                name: body.name,
+                role: body.role,
+            }
+        })
+
+        return Response.json(updateUser)
+        
+    } catch (error) {
+        console.error(error)
+
+        return Response.json(
+            {error: "Server Error"},
+            {status: 500}
+        )
+    }
+}
