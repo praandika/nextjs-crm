@@ -1,23 +1,30 @@
-let users = [
-        { id: 1, name: "Andika", role: "Data Analyst" },
-        { id: 2, name: "Desak", role: "Frontend Developer" },
-        { id: 3, name: "Inten", role: "Data Scientist" }
-    ]
+import {prisma} from "@/lib/prisma"
 
 export async function GET() {
-    return Response.json(users)
+    try {
+        const users = await prisma.user.findMany({
+        orderBy: {id: "asc"},
+        })
+
+        return Response.json(users)
+    } catch (error) {
+        console.error(error)
+        return Response.json(
+            {error: "Server Error"},
+            {status: 500}
+        )
+    }
 }
 
 export async function POST(request) {
     const body = await request.json()
 
-    const newUser = {
-        id: users.length + 1,
-        name: body.name,
-        role: body.role,
-    }
-
-    users.push(newUser)
+    const newUser = await prisma.user.create({
+        data: {
+            name: body.name,
+            role: body.role,
+        }
+    })
 
     return Response.json(newUser)
 }

@@ -7,7 +7,13 @@ export default function Home(){
   const [role, setRole] = useState("")
 
   const fetchUsers = async () => {
-    const res = await fetch("api/users")
+    const res = await fetch("/api/users")
+
+    if (!res.ok) {
+      console.error("API Error")
+      return
+    }
+    
     const data = await res.json()
     setUsers(data)
   }
